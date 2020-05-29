@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const formEl = document.getElementById('vedioForm');
-    const listOfRequestsEl = document.getElementById('listOfRequests');
+    const listOfRequestsEl = document.getElementById('listOfRequests');;
 
     getAllVedios(formEl)
         .then(response => response.json())
@@ -44,13 +44,13 @@ function setVedioRequesTemplate(videoInfo) {
                 <h3>${videoInfo.topic_title}</h3>
                 <p class="text-muted mb-2">${videoInfo.topic_details}</p>
                 <p class="mb-0 text-muted">
-                <strong>Expected results:</strong> ${videoInfo.expected_result}
+                ${videoInfo.expected_result ? '<strong>Expected results:</strong>' + videoInfo.expected_result : ''}
                 </p>
             </div>
             <div class="d-flex flex-column text-center">
-                <a class="btn btn-link">🔺</a>
+                <a id="voteUp" class="btn btn-link">🔺</a>
                 <h3>${videoInfo.votes.ups - videoInfo.votes.downs}</h3>
-                <a class="btn btn-link">🔻</a>
+                <a id="voteDown" class="btn btn-link">🔻</a>
             </div>
             </div>
             <div class="card-footer d-flex flex-row justify-content-between">
