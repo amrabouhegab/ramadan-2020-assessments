@@ -20,3 +20,11 @@ function createVedioRequest(form) {
     });
 }
 
+function getAllVedios(form) {
+    const url = 'http://localhost:7777/video-request';
+
+    return fetch(url, {
+        method: 'GET'
+    });
+}
+
