@@ -6,9 +6,9 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data && data.length > 0) {
-                data.forEach(vedioInfo => {
-                    if (vedioInfo) {
-                        listOfRequestsEl.innerHTML += setVedioRequesTemplate(vedioInfo);
+                data.forEach(videoInfo => {
+                    if (videoInfo) {
+                        listOfRequestsEl.innerHTML += setVedioRequesTemplate(videoInfo);
                     }
                 });
             }
@@ -34,7 +34,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
+function voteUp(videoInfo){
+    const id = videoInfo.id.split('_')[2];
+    voteForVideo(id, 'ups')
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            setVoteScore(data);
+        })
+        .catch(err => console.log(err));
+}
 
+function voteDown(videoInfo){
+    const id = videoInfo.id.split('_')[2];
+    voteForVideo(id, 'downs')
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            setVoteScore(data);
+        })
+        .catch(err => console.log(err));
+}
+
+function setVoteScore(videoInfo){
+    const scoreEl = document.getElementById('score_' + videoInfo._id);
+    scoreEl.innerText = videoInfo.votes.ups - videoInfo.votes.downs
+}
 
 function setVedioRequesTemplate(videoInfo) {
     return (`
@@ -48,14 +73,14 @@ function setVedioRequesTemplate(videoInfo) {
                 </p>
             </div>
             <div class="d-flex flex-column text-center">
-                <a id="voteUp" class="btn btn-link">🔺</a>
-                <h3>${videoInfo.votes.ups - videoInfo.votes.downs}</h3>
-                <a id="voteDown" class="btn btn-link">🔻</a>
+                <a id="vote_ups_${videoInfo._id}" onclick="voteUp(this)" class="btn btn-link">🔺</a>
+                <h3 id="score_${videoInfo._id}">${videoInfo.votes.ups - videoInfo.votes.downs}</h3>
+                <a id="vote_downs_${videoInfo._id}" onclick="voteDown(this)" class="btn btn-link">🔻</a>
             </div>
             </div>
             <div class="card-footer d-flex flex-row justify-content-between">
             <div>
-                <span class="text-info">${videoInfo.status.toUpperCase()}</span>
+                <span class="text-info">${videoInfo.status ? videoInfo.status.toUpperCase() : ''}</span>
                 &bullet; added by <strong>${videoInfo.author_name}</strong> on
                 <strong>${(new Date(videoInfo.submit_date)).toDateString()}</strong>
             </div>

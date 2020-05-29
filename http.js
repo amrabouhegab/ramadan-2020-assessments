@@ -20,11 +20,29 @@ function createVedioRequest(form) {
     });
 }
 
-function getAllVedios(form) {
+function getAllVedios() {
     const url = 'http://localhost:7777/video-request';
 
     return fetch(url, {
         method: 'GET'
+    });
+}
+
+function voteForVideo(id, type) {
+    const url = 'http://localhost:7777/video-request/vote';
+
+    const voteObj = {
+        id: id,
+        vote_type: type
+    }
+
+    return fetch(url, {
+        method: 'PUT',
+        body: JSON.stringify(voteObj),
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
     });
 }
 
