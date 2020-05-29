@@ -1,21 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     const formEl = document.getElementById('vedioForm');
-    const listOfRequestsEl = document.getElementById('listOfRequests');;
+    const listOfRequestsEl = document.getElementById('listOfRequests');
 
-    getAllVedios(formEl)
-        .then(response => response.json())
-        .then(data => {
-            if (data && data.length > 0) {
-                data.forEach(videoInfo => {
-                    if (videoInfo) {
-                        listOfRequestsEl.innerHTML += setVedioRequesTemplate(videoInfo);
-                    }
-                });
-            }
-        })
-        .catch(err => {
-            console.log(err);
-        });
+    getAllVideoRequests(listOfRequestsEl, null);
 
     formEl.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -33,6 +20,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 });
+
+function sortByNew() {
+    const listOfRequestsEl = document.getElementById('listOfRequests');
+    listOfRequestsEl.innerHTML = '';
+    getAllVideoRequests(listOfRequestsEl, null);
+}
+
+function sortByTopVoted() {
+    const listOfRequestsEl = document.getElementById('listOfRequests');
+    listOfRequestsEl.innerHTML = '';
+    getAllVideoRequests(listOfRequestsEl, 'topVotedFirst');
+}
 
 function voteUp(videoInfo){
     const id = videoInfo.id.split('_')[2];
@@ -61,6 +60,23 @@ function setVoteScore(videoInfo){
     scoreEl.innerText = videoInfo.votes.ups - videoInfo.votes.downs
 }
 
+function getAllVideoRequests(listOfRequestsEl, sortBy) {
+    getAllVedios(sortBy)
+    .then(response => response.json())
+    .then(data => {
+        if (data && data.length > 0) {
+            data.forEach(videoInfo => {
+                if (videoInfo) {
+                    listOfRequestsEl.innerHTML += setVedioRequesTemplate(videoInfo);
+                }
+            });
+        }
+    })
+    .catch(err => {
+        console.log(err);
+    });
+}
+
 function setVedioRequesTemplate(videoInfo) {
     return (`
         <div class="card mb-3">
@@ -69,7 +85,7 @@ function setVedioRequesTemplate(videoInfo) {
                 <h3>${videoInfo.topic_title}</h3>
                 <p class="text-muted mb-2">${videoInfo.topic_details}</p>
                 <p class="mb-0 text-muted">
-                ${videoInfo.expected_result ? '<strong>Expected results:</strong>' + videoInfo.expected_result : ''}
+                ${videoInfo.expected_result ? '<strong>Expected results: </strong>' + videoInfo.expected_result : ''}
                 </p>
             </div>
             <div class="d-flex flex-column text-center">
