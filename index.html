@@ -96,12 +96,13 @@
         <div class="row">
           <div class="col-md">
             <div class="btn-group" role="group" aria-label="Basic example">
-              <button class="btn btn-primary" type="button" onclick="sortByNew()">New First</button>
-              <button class="btn btn-primary" type="button" onclick="sortByTopVoted()">Top Voted First</button>
+              <button class="btn btn-primary" type="button" onclick="sortByNew(this)" id="sort_by_new">New First</button>
+              <button class="btn btn-primary" type="button" onclick="sortByTopVoted(this)" id="sort_by_top">Top Voted First</button>
             </div>
           </div>
-          <div class="col-md">
-            
+          <div class="col-md-3">
+            <!-- Search form -->
+            <input class="form-control" type="text" placeholder="Search" aria-label="Search">
           </div>
         </div>
       </div>

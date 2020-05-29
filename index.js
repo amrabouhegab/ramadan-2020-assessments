@@ -21,13 +21,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
-function sortByNew() {
+function sortByNew(btn) {
+    btn.classList.add('active');
+    document.getElementById('sort_by_top').classList.remove('active');
     const listOfRequestsEl = document.getElementById('listOfRequests');
     listOfRequestsEl.innerHTML = '';
     getAllVideoRequests(listOfRequestsEl, null);
 }
 
-function sortByTopVoted() {
+function sortByTopVoted(btn) {
+    btn.classList.add('active');
+    document.getElementById('sort_by_new').classList.remove('active');
     const listOfRequestsEl = document.getElementById('listOfRequests');
     listOfRequestsEl.innerHTML = '';
     getAllVideoRequests(listOfRequestsEl, 'topVotedFirst');
