@@ -20,8 +20,12 @@ function createVedioRequest(form) {
     });
 }
 
-function getAllVedios(sortBy) {
-    const url = 'http://localhost:7777/video-request?sortBy=' + sortBy;
+function getAllVedios(sortBy, searchTerm) {
+    let url = `http://localhost:7777/video-request?sortBy=${sortBy ? sortBy : ''}`;
+    if (searchTerm) {
+        url += `&searchTerm=${searchTerm}`;
+    }
+
 
     return fetch(url, {
         method: 'GET'

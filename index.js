@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     const formEl = document.getElementById('vedioForm');
     const listOfRequestsEl = document.getElementById('listOfRequests');
+    const searchBoxEl = document.getElementById('search');
 
-    getAllVideoRequests(listOfRequestsEl, null);
+    getAllVideoRequests(listOfRequestsEl, null, null);
 
     formEl.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -19,22 +20,24 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     });
 
+    searchBoxEl.addEventListener('input', function(e) {
+        getAllVideoRequests(listOfRequestsEl, null, e.target.value);
+    });
+
 });
 
 function sortByNew(btn) {
     btn.classList.add('active');
     document.getElementById('sort_by_top').classList.remove('active');
     const listOfRequestsEl = document.getElementById('listOfRequests');
-    listOfRequestsEl.innerHTML = '';
-    getAllVideoRequests(listOfRequestsEl, null);
+    getAllVideoRequests(listOfRequestsEl, null, null);
 }
 
 function sortByTopVoted(btn) {
     btn.classList.add('active');
     document.getElementById('sort_by_new').classList.remove('active');
     const listOfRequestsEl = document.getElementById('listOfRequests');
-    listOfRequestsEl.innerHTML = '';
-    getAllVideoRequests(listOfRequestsEl, 'topVotedFirst');
+    getAllVideoRequests(listOfRequestsEl, 'topVotedFirst', null);
 }
 
 function voteUp(videoInfo){
@@ -64,11 +67,12 @@ function setVoteScore(videoInfo){
     scoreEl.innerText = videoInfo.votes.ups - videoInfo.votes.downs
 }
 
-function getAllVideoRequests(listOfRequestsEl, sortBy) {
-    getAllVedios(sortBy)
+function getAllVideoRequests(listOfRequestsEl, sortBy, searchTerm) {
+    getAllVedios(sortBy, searchTerm)
     .then(response => response.json())
     .then(data => {
         if (data && data.length > 0) {
+            listOfRequestsEl.innerHTML = '';
             data.forEach(videoInfo => {
                 if (videoInfo) {
                     listOfRequestsEl.innerHTML += setVedioRequesTemplate(videoInfo);
