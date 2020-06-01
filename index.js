@@ -1,3 +1,6 @@
+let sortBy = '';
+let searchTerm = '';
+
 document.addEventListener('DOMContentLoaded', function() {
     const formEl = document.getElementById('vedioForm');
     const listOfRequestsEl = document.getElementById('listOfRequests');
@@ -20,9 +23,11 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     });
 
-    searchBoxEl.addEventListener('input', function(e) {
-        getAllVideoRequests(listOfRequestsEl, null, e.target.value);
-    });
+    searchBoxEl.addEventListener('input', debounce((e) => {
+        e.preventDefault();
+        searchTerm = e.target.value ? e.target.value.trim() : '';
+        getAllVideoRequests(listOfRequestsEl, sortBy, searchTerm);
+    }, 500));
 
 });
 
@@ -30,14 +35,16 @@ function sortByNew(btn) {
     btn.classList.add('active');
     document.getElementById('sort_by_top').classList.remove('active');
     const listOfRequestsEl = document.getElementById('listOfRequests');
-    getAllVideoRequests(listOfRequestsEl, null, null);
+    sortBy = '';
+    getAllVideoRequests(listOfRequestsEl, null, searchTerm);
 }
 
 function sortByTopVoted(btn) {
     btn.classList.add('active');
     document.getElementById('sort_by_new').classList.remove('active');
     const listOfRequestsEl = document.getElementById('listOfRequests');
-    getAllVideoRequests(listOfRequestsEl, 'topVotedFirst', null);
+    sortBy = 'topVotedFirst';
+    getAllVideoRequests(listOfRequestsEl, 'topVotedFirst', searchTerm);
 }
 
 function voteUp(videoInfo){
@@ -71,8 +78,8 @@ function getAllVideoRequests(listOfRequestsEl, sortBy, searchTerm) {
     getAllVedios(sortBy, searchTerm)
     .then(response => response.json())
     .then(data => {
+        listOfRequestsEl.innerHTML = '';
         if (data && data.length > 0) {
-            listOfRequestsEl.innerHTML = '';
             data.forEach(videoInfo => {
                 if (videoInfo) {
                     listOfRequestsEl.innerHTML += setVedioRequesTemplate(videoInfo);
@@ -118,4 +125,14 @@ function setVedioRequesTemplate(videoInfo) {
             </div>
         </div>
     `);
+}
+
+function debounce(fn, time) {
+    let timeout;
+
+    return function () {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => fn.apply(this, arguments), time);
+    }
+
 }
