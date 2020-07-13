@@ -40,7 +40,7 @@ function submitVedioRequest(formEl, listOfRequestsEl) {
     if (!validateForm(formEl))
       return;
 
-    createVedioRequest(formEl)
+    createVedioRequest(formEl, state.user_id)
       .then(response => response.json())
       .then(videoInfo => {
         if (videoInfo) {
@@ -59,44 +59,6 @@ function searchForVedioRequest(searchBoxEl, listOfRequestsEl) {
     state.searchTerm = e.target.value ? e.target.value.trim() : '';
     getAllVideoRequests(listOfRequestsEl, state.sortBy, state.searchTerm);
   }, 500));
-}
-
-function loginFn(signInBtnEl, signInFormEl) {
-  signInBtnEl.addEventListener('click', (e) => {
-    e.preventDefault();
-
-    if (!validateLoginForm(signInFormEl))
-      return;
-
-    const name = signInFormEl.userName.value;
-    const email = signInFormEl.email.value;
-    const body = {
-      name,
-      email
-    };
-    console.log('body', body);
-    login(body).then(val => {
-      console.log('val', val);
-    });
-  });
-}
-
-function signUpFn(signUpBtnEl, signInFormEl) {
-  signUpBtnEl.addEventListener("click", e => {
-    e.preventDefault();
-
-    if (!validateLoginForm(signInFormEl))
-      return;
-
-    console.log(signInFormEl);
-    const name = signInFormEl.userName.value;
-    const email = signInFormEl.email.value;
-    const body = {
-      name,
-      email
-    };
-    console.log("body", body);
-  });
 }
 
 function sortByNew(btn) {

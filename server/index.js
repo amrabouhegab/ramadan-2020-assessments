@@ -21,8 +21,10 @@ app.get('/', (req, res) =>
 );
 
 app.post('/video-request', async (req, res, next) => {
-  const { id } = req.query;
-  const user = await UsersModel.findOne({_id: id});
+  const { user_id } = req.query;
+  const user = await UsersModel.findOne({_id: user_id});
+  req.body.author_name = user.author_name;
+  req.body.author_email = user.author_email;
   const response = await VideoRequestData.createRequest(req.body);
   res.send(response);
   next();
@@ -38,8 +40,8 @@ app.get('/video-request', async (req, res, next) => {
   }
   if (sortBy && sortBy === 'topVotedFirst') {
     data.sort((prev, next) => {
-      const vote1 = prev.votes.ups - prev.votes.downs;
-      const vote2 = next.votes.ups - next.votes.downs;
+      const vote1 = prev.votes.ups.length - prev.votes.downs.length;
+      const vote2 = next.votes.ups.length - next.votes.downs.length;
       if (vote1 > vote2) {
         return -1;
       } else {
@@ -61,6 +63,7 @@ app.get('/users', async (req, res, next) => {
 });
 
 app.post('/users/login', async (req, res, next) => {
+  console.log()
   const response = await UserData.createUser(req.body);
   res.redirect(`http://localhost:5500?id=${response._id}`);
   next();
