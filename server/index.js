@@ -6,6 +6,7 @@ const VideoRequestData = require('./data/video-requests.data');
 const UserData = require('./data/user.data');
 const cors = require('cors');
 const mongoose = require('./models/mongo.config');
+const UsersModel = require('./models/user.model');
 
 if (!Object.keys(mongoose).length) return;
 
@@ -20,6 +21,8 @@ app.get('/', (req, res) =>
 );
 
 app.post('/video-request', async (req, res, next) => {
+  const { id } = req.query;
+  const user = await UsersModel.findOne({_id: id});
   const response = await VideoRequestData.createRequest(req.body);
   res.send(response);
   next();
@@ -48,10 +51,13 @@ app.get('/video-request', async (req, res, next) => {
   next();
 });
 
+app.use(express.json());
+
 app.get('/users', async (req, res, next) => {
   const response = await UserData.getAllUsers(req.body);
   res.send(response);
   next();
+
 });
 
 app.post('/users/login', async (req, res, next) => {
@@ -63,8 +69,8 @@ app.post('/users/login', async (req, res, next) => {
 app.use(express.json());
 
 app.put('/video-request/vote', async (req, res, next) => {
-  const { id, vote_type } = req.body;
-  const response = await VideoRequestData.updateVoteForRequest(id, vote_type);
+  const { id, vote_type, user_id } = req.body;
+  const response = await VideoRequestData.updateVoteForRequest(id, vote_type, user_id);
   res.send(response);
   next();
 });

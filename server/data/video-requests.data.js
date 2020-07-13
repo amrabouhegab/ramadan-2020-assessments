@@ -31,15 +31,29 @@ module.exports = {
     return VideoRequest.findByIdAndUpdate(id, updates, { new: true });
   },
 
-  updateVoteForRequest: async (id, vote_type) => {
+  updateVoteForRequest: async (id, vote_type, user_id) => {
     const oldRequest = await VideoRequest.findById({ _id: id });
     const other_type = vote_type === 'ups' ? 'downs' : 'ups';
+
+    let oldVotes = oldRequest.votes[vote_type];
+    let otherOldVotes = oldRequest.votes[other_type];
+
+    if (!oldVotes.includes(user_id)) {
+      oldVotes.push(user_id);
+    } else {
+      oldVotes = oldVotes.filter(val => val !== user_id);
+    }
+
+    if (otherOldVotes.includes(user_id)) {
+      otherOldVotes = otherOldVotes.filter(val => val !== user_id);
+    }
+  
     return VideoRequest.findByIdAndUpdate(
       { _id: id },
       {
         votes: {
-          [vote_type]: ++oldRequest.votes[vote_type],
-          [other_type]: oldRequest.votes[other_type],
+          [vote_type]: oldVotes,
+          [other_type]: otherOldVotes,
         },
       },
       {new: true}
