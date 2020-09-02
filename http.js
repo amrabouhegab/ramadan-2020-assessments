@@ -50,3 +50,29 @@ function voteForVideo(id, type, user_id) {
         }
     });
 }
+function deleteVedioRequest(videoObj) {
+    const url = 'http://localhost:7777/video-request';
+
+    return fetch(url, {
+        method: 'DELETE',
+        body: JSON.stringify(videoObj),
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    });
+}
+
+function updateVedioRequest(videoObj) {
+    console.log(videoObj);
+    const url = 'http://localhost:7777/video-request';
+
+    return fetch(url, {
+        method: 'PUT',
+        body: JSON.stringify(videoObj),
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    });
+}

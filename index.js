@@ -1,11 +1,12 @@
-// let searchTerm = '';
-// let user_id = '';
+const SUPER_USER_ID = '5f4d4de59a64e34a145b2e43';
 
 let state = {
   sortBy: '',
   searchTerm: '',
-  user_id: ''
+  user_id: '',
+  isAdmin: false
 }
+
 document.addEventListener('DOMContentLoaded', function() {
     const formEl = document.getElementById('vedioForm');
     const listOfRequestsEl = document.getElementById('listOfRequests');
@@ -19,6 +20,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (state.user_id) {
       loginFormEl.classList.add("d-none");
       appContentEl.classList.remove("d-none");
+      state.isAdmin = state.user_id === SUPER_USER_ID;
+      if (state.isAdmin) {
+        const vedioActionsElm = document.getElementById("video_action");
+
+        formEl.classList.add("d-none");
+        vedioActionsElm.classList.add("d-none");
+        
+      }
     }
   }
 
@@ -48,7 +57,7 @@ function submitVedioRequest(formEl, listOfRequestsEl) {
         }
       })
       .catch(err => {
-        console.log(err);
+
       });
   });
 }
@@ -78,6 +87,7 @@ function sortByTopVoted(btn) {
 }
 
 function voteUp(videoInfo) {
+  if (state.isAdmin) return;
   const id = videoInfo.id.split("_")[2];
   voteForVideo(id, "ups", state.user_id)
     .then(response => response.json())
@@ -88,11 +98,11 @@ function voteUp(videoInfo) {
 }
 
 function voteDown(videoInfo) {
+  if (state.isAdmin) return;
   const id = videoInfo.id.split("_")[2];
   voteForVideo(id, "downs", state.user_id)
-    .then(response => response.json())
+    .then(response => response.json ())
     .then(data => {
-      console.log(data);
       setVoteScore(data, "downs");
     })
     .catch(err => console.log(err));
@@ -105,11 +115,18 @@ function setVoteScore(videoInfo, vote_type){
 }
 
 function setArrowsStyle(videoInfo, vote_type = null) {
-  console.log('setArrowsStyle', videoInfo, vote_type);
   const voteUpBtnElm = document.getElementById(`vote_ups_${videoInfo._id}`);
   const voteDownBtnElm = document.getElementById(`vote_downs_${videoInfo._id}`);
   const voteDirElm = vote_type === "ups" ? voteUpBtnElm : voteDownBtnElm;
   const otherDirElm = vote_type === "ups" ? voteDownBtnElm : voteUpBtnElm;
+
+  if (state.isAdmin) {
+    voteUpBtnElm.style.opacity = "0.5";
+    voteUpBtnElm.style.cursor = 'not-allowed';
+    voteDownBtnElm.style.opacity = "0.5";
+    voteDownBtnElm.style.cursor = 'not-allowed';
+    return;
+  }
 
   if (vote_type) {
     if (videoInfo.votes[vote_type].includes(state.user_id)) {
@@ -152,7 +169,22 @@ function getAllVideoRequests(listOfRequestsEl, sortBy, searchTerm) {
 function setVedioRequesTemplate(videoInfo) {
   return (`
       <div class="card mb-3">
-          <div class="card-body d-flex justify-content-between flex-row">
+        ${state.isAdmin  ? `
+        <div class="card-header d-flex justify-content-between">
+          <select id="admin_change_status_${videoInfo._id}" onChange="onStatusChange(this)" value="videoInfo.status.toLowerCase()">
+            <option value="new">new</option>
+            <option value="done">done</option>
+            <option value="planned">planned</option>
+          </select>
+          <div class="input-group ml-2 mr-5 ${videoInfo.status.toLowerCase() !== 'done' ? 'd-none' : ''}" id="admin_link_container_${videoInfo._id}">
+            <input type="text" class="form-control" placeholder="Paste here Youtube vedio link" id="admin_link_input_${videoInfo._id}" required value="${videoInfo.video_ref.link}">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" type="button" id="admin_save_${videoInfo._id}" onclick="addLink(this)">Save</button>
+            </div>
+          </div>
+          <button class="btn btn-danger" type="button" id="admin_delete_${videoInfo._id}" onclick="adminDelete(this)">Delete</button>
+        </div>` : ''}
+        <div class="card-body d-flex justify-content-between flex-row">
           <div class="d-flex flex-column">
               <h3>${videoInfo.topic_title}</h3>
               <p class="text-muted mb-2">${videoInfo.topic_details}</p>
@@ -266,4 +298,55 @@ function validateLoginForm(form) {
   });
 
   return !invalidElms.length;
+}
+
+function adminSave(videoObj) {
+  const listOfRequestsEl = document.getElementById('listOfRequests');
+
+  updateVedioRequest(videoObj).then(value => {
+
+    // get All Vedios
+    getAllVideoRequests(listOfRequestsEl, null, null);
+  });
+
+}
+
+function addLink(elm) {
+  const videoId = elm.id.split("_")[2];
+  const linkInputElm = document.querySelector(`[id^=admin_link_input][id$=_${videoId}]`);
+
+  if (!linkInputElm.value) {
+    linkInputElm.classList.add("is-invalid");
+    linkInputElm.addEventListener('input', function () {
+      linkInputElm.classList.remove("is-invalid");
+    });
+    return;
+  }
+
+  adminSave({id: videoId, resVideo: linkInputElm.value, status: 'done'});
+}
+
+
+function adminDelete(elm) {
+  const listOfRequestsEl = document.getElementById('listOfRequests');
+  const videoId = elm.id.split("_")[2];
+  deleteVedioRequest({id: videoId}).then(value => {
+    // get All Vedios
+    getAllVideoRequests(listOfRequestsEl, null, null);
+  });
+}
+
+function onStatusChange(selectElm) {
+  const videoId = selectElm.id.split("_")[3];
+  const adminLinkContainer  = document.getElementById(`admin_link_container_${videoId}`);
+  if (selectElm.value === 'done') {
+    if (adminLinkContainer.classList.contains('d-none')) {
+      adminLinkContainer.classList.remove('d-none');
+    }
+  } else {
+    if (!adminLinkContainer.classList.contains('d-none')) {
+      adminLinkContainer.classList.remove('d-none');
+    }
+    adminSave({id: videoId, status: selectElm.value});
+  }
 }
