@@ -6,13 +6,17 @@ module.exports = {
     return newRequest.save();
   },
 
-  getAllVideoRequests: (top) => {
-    return VideoRequest.find({}).sort({ submit_date: '-1' }).limit(top);
+  getAllVideoRequests: (filterBy) => {
+    const filter = filterBy === 'all' || !filterBy ? {} : {status: filterBy};
+    return VideoRequest.find(filter).sort({ submit_date: '-1' });
   },
 
-  searchRequests: (topic) => {
-    return VideoRequest.find({ topic_title: {$regex: topic, $options: 'i'} })
-      .sort({ submit_date: '-1' });
+  searchRequests: (topic, filterBy) => {
+    const filter = { topic_title: {$regex: topic, $options: 'i'} }
+    if (filterBy && filterBy !== 'all') {
+      filter.status = filterBy;
+    }
+    return VideoRequest.find(filter).sort({ submit_date: '-1' });
   },
 
   getRequestById: (id) => {

@@ -89,6 +89,14 @@
                 First</button>
             </div>
           </div>
+          <div class="col-md" id="admin_filter_group">
+            <div class="btn-group" role="group" aria-label="Basic example">
+              <button class="btn btn-primary active" type="button" onclick="filter(this, 'all')" id="filter_by_all">All</button>
+              <button class="btn btn-primary" type="button" onclick="filter(this, 'new')" id="filter_by_new">New</button>
+              <button class="btn btn-primary" type="button" onclick="filter(this, 'planned')" id="filter_by_planned">Planned</button>
+              <button class="btn btn-primary" type="button" onclick="filter(this, 'done')" id="filter_by_done">Done</button>
+            </div>
+          </div>
           <div class="col-md-3">
             <!-- Search form -->
             <input class="form-control" type="search" placeholder="Search" id="search">
@@ -99,6 +107,8 @@
       </div>
     </div>
   </div>
+  
+
   <script src="http.js"></script>
   <script src="index.js"></script>
 </body>

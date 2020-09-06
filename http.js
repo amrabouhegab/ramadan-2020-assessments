@@ -20,10 +20,14 @@ function createVedioRequest(form, user_id) {
     });
 }
 
-function getAllVedios(sortBy, searchTerm) {
+function getAllVedios(sortBy, searchTerm, filterBy = '') {
     let url = `http://localhost:7777/video-request?sortBy=${sortBy ? sortBy : ''}`;
     if (searchTerm) {
         url += `&searchTerm=${searchTerm}`;
+    }
+
+    if (filterBy) {
+        url += `&filterBy=${filterBy}`;
     }
 
 
